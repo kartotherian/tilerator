@@ -205,6 +205,14 @@ function createServer(app) {
     }).then(function () {
         app.logger.log('info',
             'Worker ' + process.pid + ' listening on ' + (app.conf.interface || '*') + ':' + app.conf.port);
+
+        // Don't delay incomplete packets for 40ms (Linux default) on
+        // pipelined HTTP sockets. We write in large chunks or buffers, so
+        // lack of coalescing should not be an issue here.
+        server.on("connection", function(socket) {
+            socket.setNoDelay(true);
+        });
+
         return server;
     });
 
