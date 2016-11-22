@@ -79,7 +79,7 @@ router.get('/siteinfo/:prop?', (req, res) => {
 
 
 /*
- *  PAGE MASSAGING SECTION  *
+ *  PAGE MASSAGING SECTION
  */
 
 /**

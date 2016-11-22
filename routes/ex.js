@@ -15,7 +15,7 @@ const HTTPError = sUtil.HTTPError;
 const router = sUtil.router();
 
 /*
- *  ERROR EXAMPLES  *
+ *  ERROR EXAMPLES
  */
 
 
