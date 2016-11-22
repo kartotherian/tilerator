@@ -1,29 +1,22 @@
 'use strict';
 
 
-var BBPromise = require('bluebird');
-var preq = require('preq');
-var sUtil = require('../lib/util');
-var fs = BBPromise.promisifyAll(require('fs'));
+const BBPromise = require('bluebird');
+const sUtil = require('../lib/util');
+const fs = BBPromise.promisifyAll(require('fs'));
 
 // shortcut
-var HTTPError = sUtil.HTTPError;
+const HTTPError = sUtil.HTTPError;
 
 
 /**
  * The main router object
  */
-var router = sUtil.router();
+const router = sUtil.router();
 
-/**
- * The main application object reported when this module is require()d
- */
-var app;
-
-
-/********************
+/*
  *  ERROR EXAMPLES  *
- ********************/
+ */
 
 
 /**
@@ -31,10 +24,10 @@ var app;
  * An example route creating an invalid array to show generic,
  * direct error handling
  */
-router.get('/err/array', function(req, res) {
+router.get('/err/array', (req, res) => {
 
     // let's create an array with -1 elems!
-    var arr = new Array(-1);
+    const arr = new Array(-1);
     // this is never reached
     res.send(arr.join());
 
@@ -47,14 +40,14 @@ router.get('/err/array', function(req, res) {
  * read a non-existent file, which will produce an error,
  * automatically handled by the template.
  */
-router.get('/err/file', function(req, res) {
+router.get('/err/file', (req, res) => {
 
     // NOTE the return statement here, the promise
     // must be returned!
     // read the file
     return fs.readFileAsync('../mushrooms.txt')
     // and then send it back to the caller
-    .then(function(text) {
+    .then((text) => {
         // note that this point is never reached
         res.send(text);
     });
@@ -66,12 +59,12 @@ router.get('/err/file', function(req, res) {
  * GET /err/manual/error
  * Throws a generic error manually
  */
-router.get('/err/manual/error', function(req, res) {
+router.get('/err/manual/error', (req, res) => {
 
     // simulate a constraint check
-    var max = 50;
-    if(max > 10) {
-        throw new Error('A maximum value of 10 is expected, ' + max + ' given!');
+    const max = 50;
+    if (max > 10) {
+        throw new Error(`A maximum value of 10 is expected, ${max} given!`);
     }
 
 });
@@ -81,7 +74,7 @@ router.get('/err/manual/error', function(req, res) {
  * GET /err/manual/deny
  * Denies access to this resource endpoint
  */
-router.get('/err/manual/deny', function(req, res) {
+router.get('/err/manual/deny', (req, res) => {
 
     // don't allow access
     throw new HTTPError({
@@ -97,14 +90,14 @@ router.get('/err/manual/deny', function(req, res) {
 /**
  * GET /err/manual/auth
  */
-router.get('/err/manual/auth', function(req, res) {
+router.get('/err/manual/auth', (req, res) => {
 
     // pretend to read a token file
     // again, note the return statement
-    return fs.readFileAsync(__dirname + '/../static/index.html')
+    return fs.readFileAsync(`${__dirname}/../static/index.html`)
     // and pretend to compare it with what the user sent
-    .then(function(token) {
-        if(!req.params || req.params.token !== token) {
+    .then((token) => {
+        if (!req.params || req.params.token !== token) {
             // nope, not authorised to be here, sorry
             throw new HTTPError({
                 status: 401,
@@ -118,14 +111,12 @@ router.get('/err/manual/auth', function(req, res) {
 });
 
 
-module.exports = function(appObj) {
-
-    app = appObj;
+module.exports = (appObj) => {
 
     return {
         path: '/ex',
         skip_domain: true,
-        router: router
+        router
     };
 
 };

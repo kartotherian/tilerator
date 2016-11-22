@@ -1,25 +1,24 @@
 'use strict';
 
 
-var BBPromise = require('bluebird');
-var preq = require('preq');
-var domino = require('domino');
-var sUtil = require('../lib/util');
-var apiUtil = require('../lib/api-util');
+const BBPromise = require('bluebird');
+const domino = require('domino');
+const sUtil = require('../lib/util');
+const apiUtil = require('../lib/api-util');
 
 // shortcut
-var HTTPError = sUtil.HTTPError;
+const HTTPError = sUtil.HTTPError;
 
 
 /**
  * The main router object
  */
-var router = sUtil.router();
+const router = sUtil.router();
 
 /**
  * The main application object reported when this module is require()d
  */
-var app;
+let app;
 
 
 /**
@@ -39,10 +38,10 @@ var app;
  * 2) GET /{domain}/v1/siteinfo/mainpage (or other props available in
  *      the general siprop, as supported by MWAPI)
  */
-router.get('/siteinfo/:prop?', function(req, res) {
+router.get('/siteinfo/:prop?', (req, res) => {
 
     // construct the query for the MW Action API
-    var apiQuery = {
+    const apiQuery = {
         format: 'json',
         action: 'query',
         meta: 'siteinfo',
@@ -52,21 +51,21 @@ router.get('/siteinfo/:prop?', function(req, res) {
     // send it
     return apiUtil.mwApiGet(app, req.params.domain, apiQuery)
     // and then return the result to the caller
-    .then(function(apiRes) {
+    .then((apiRes) => {
         // do we have to return only one prop?
-        if(req.params.prop) {
+        if (req.params.prop) {
             // check it exists in the response body
-            if(apiRes.body.query.general[req.params.prop] === undefined) {
+            if (apiRes.body.query.general[req.params.prop] === undefined) {
                 // nope, error out
                 throw new HTTPError({
                     status: 404,
                     type: 'not_found',
                     title: 'No such property',
-                    detail: 'Property ' + req.params.prop + ' not found in MW API response!'
+                    detail: `Property ${req.params.prop} not found in MW API response!`
                 });
             }
             // ok, return that prop
-            var ret = {};
+            const ret = {};
             ret[req.params.prop] = apiRes.body.query.general[req.params.prop];
             res.status(200).json(ret);
             return;
@@ -79,9 +78,9 @@ router.get('/siteinfo/:prop?', function(req, res) {
 });
 
 
-/****************************
+/*
  *  PAGE MASSAGING SECTION  *
- ****************************/
+ */
 
 /**
  * A helper function that obtains the Parsoid HTML for a given title and
@@ -94,8 +93,8 @@ router.get('/siteinfo/:prop?', function(req, res) {
 function getBody(domain, title) {
 
     // get the page
-    return apiUtil.restApiGet(app, domain, 'page/html/' + title)
-    .then(function(callRes) {
+    return apiUtil.restApiGet(app, domain, `page/html/${title}`)
+    .then((callRes) => {
         // and then load and parse the page
         return BBPromise.resolve(domino.createDocument(callRes.body));
     });
@@ -107,12 +106,12 @@ function getBody(domain, title) {
  * GET /page/{title}
  * Gets the body of a given page.
  */
-router.get('/page/:title', function(req, res) {
+router.get('/page/:title', (req, res) => {
 
     // get the page's HTML directly
     return getBody(req.params.domain, req.params.title)
     // and then return it
-    .then(function(doc) {
+    .then((doc) => {
         res.status(200).type('html').end(doc.body.innerHTML);
     });
 
@@ -123,22 +122,22 @@ router.get('/page/:title', function(req, res) {
  * GET /page/{title}/lead
  * Gets the leading section of a given page.
  */
-router.get('/page/:title/lead', function(req, res) {
+router.get('/page/:title/lead', (req, res) => {
 
     // get the page's HTML directly
     return getBody(req.params.domain, req.params.title)
     // and then find the leading section and return it
-    .then(function(doc) {
-        var leadSec = '';
+    .then((doc) => {
+        let leadSec = '';
         // find all paragraphs directly under the content div
-        var ps = doc.querySelectorAll('p') || [];
-        for(var idx = 0; idx < ps.length; idx++) {
-            var child = ps[idx];
+        const ps = doc.querySelectorAll('p') || [];
+        for (let idx = 0; idx < ps.length; idx++) {
+            const child = ps[idx];
             // find the first paragraph that is not empty
-            if(!/^\s*$/.test(child.innerHTML) ) {
+            if (!/^\s*$/.test(child.innerHTML)) {
                 // that must be our leading section
                 // so enclose it in a <div>
-                leadSec = '<div id="lead_section">' + child.innerHTML + '</div>';
+                leadSec = `<div id="lead_section">${child.innerHTML}</div>`;
                 break;
             }
         }
@@ -148,14 +147,14 @@ router.get('/page/:title/lead', function(req, res) {
 });
 
 
-module.exports = function(appObj) {
+module.exports = (appObj) => {
 
     app = appObj;
 
     return {
         path: '/',
         api_version: 1,
-        router: router
+        router
     };
 
 };
