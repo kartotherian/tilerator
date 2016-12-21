@@ -40,7 +40,7 @@ router.get('/', (req, res, next) => {
     if ({}.hasOwnProperty.call(req.query || {}, 'spec')) {
         res.json(app.conf.spec);
     } else if ({}.hasOwnProperty.call(req.query || {}, 'doc')) {
-        swaggerUi.processRequest(app, req, res);
+        return swaggerUi.processRequest(app, req, res);
     } else {
         next();
     }
