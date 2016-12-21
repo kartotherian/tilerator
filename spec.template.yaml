@@ -46,6 +46,12 @@ paths:
               spec: true
           response:
             status: 200
+        - title: doc from root
+          request:
+            query:
+              doc: true
+          response:
+            status: 200
         - title: root with wrong query param
           request:
             query:
