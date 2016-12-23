@@ -8,6 +8,7 @@
     "test": "PREQ_CONNECT_TIMEOUT=15 mocha && nsp check",
     "docker-start": "service-runner docker-start",
     "docker-test": "service-runner docker-test",
+    "test-build": "service-runner docker-test && service-runner build --deploy-repo --force",
     "coverage": "istanbul cover _mocha -- -R spec"
   },
   "repository": {
