@@ -167,6 +167,7 @@ return tilerator.bootstrap(app).then(function() {
     console.log('done');
     setTimeout(function () {
         // TODO: some code is not doing proper cleanup, so force-quit
+        console.log('Suspected tileshell.js hangup, attempting to dump reasons for not exiting');
         whyNodeIsRunning();
         process.exit(0);
     }, 500)
