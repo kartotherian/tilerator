@@ -1,8 +1,6 @@
 'use strict';
 
 
-require('core-js/shim');
-
 var http = require('http');
 var BBPromise = require('bluebird');
 var express = require('express');
