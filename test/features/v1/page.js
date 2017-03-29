@@ -13,7 +13,7 @@ describe('page gets', function() {
     before(function () { return server.start(); });
 
     // common URI prefix for the page
-    var uri = server.config.uri + 'en.wikipedia.org/v1/page/Mulholland_Drive_(film)/';
+    var uri = server.config.uri + 'en.wikipedia.org/v1/page/Table_(database)/';
 
     it('should get the whole page body', function() {
         return preq.get({
@@ -26,7 +26,7 @@ describe('page gets', function() {
             // inspect the body
             assert.notDeepEqual(res.body, undefined, 'No body returned!');
             // this should be the right page
-            if(!/mw:PageProp\/displaytitle.+Mulholland/.test(res.body)) {
+            if(!/Table_\(database\)#cite/.test(res.body)) {
                 throw new Error('Not the title I was expecting!');
             }
         });
@@ -43,7 +43,7 @@ describe('page gets', function() {
             // inspect the body
             assert.notDeepEqual(res.body, undefined, 'No body returned!');
             // this should be the right page
-            if(!/Mulholland/.test(res.body)) {
+            if(!/Table/.test(res.body)) {
                 throw new Error('Not the page I was expecting!');
             }
             // .. and should start with <div id="lead_section">
