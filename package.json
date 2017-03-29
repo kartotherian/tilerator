@@ -55,7 +55,7 @@
   },
   "deploy": {
     "target": "debian",
-    "node": "4.6.0",
+    "node": "6.9.1",
     "dependencies": {
       "_all": []
     }
