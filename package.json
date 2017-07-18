@@ -1,6 +1,6 @@
 {
   "name": "service-template-node",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "A blueprint for MediaWiki REST API services",
   "main": "./app.js",
   "scripts": {
@@ -52,6 +52,7 @@
     "mocha-eslint":"^3.0.1",
     "eslint": "^3.12.0",
     "eslint-config-node-services": "^2.0.2",
+    "eslint-config-wikimedia": "^0.4.0",
     "eslint-plugin-json": "^1.2.0",
     "eslint-plugin-jsdoc": "^3.0.0"
   },
