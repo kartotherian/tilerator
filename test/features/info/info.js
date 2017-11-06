@@ -66,5 +66,6 @@ describe('service information', function() {
         });
     });
 
+    after(() => server.stop());
 });
 

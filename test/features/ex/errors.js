@@ -85,5 +85,6 @@ describe('errors', function() {
         });
     });
 
+    after(() => server.stop());
 });
 

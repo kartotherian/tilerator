@@ -285,5 +285,7 @@ describe('Swagger spec', function() {
 
     });
 
+    after(() => server.stop());
+
 });
 

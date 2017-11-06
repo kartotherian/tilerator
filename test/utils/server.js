@@ -35,7 +35,7 @@ config.conf.logging = {
 // make a deep copy of it for later reference
 const origConfig = extend(true, {}, config);
 
-let stop = () => { return BBPromise.resolve(); };
+module.exports.stop = () => { return BBPromise.resolve(); };
 let options = null;
 const runner = new ServiceRunner();
 
@@ -45,26 +45,29 @@ function start(_options) {
     _options = _options || {};
 
     if (!assert.isDeepEqual(options, _options)) {
-        console.log('server options changed; restarting'); // eslint-disable-line no-console
-        return stop().then(() => {
+        console.log('starting test server'); // eslint-disable-line no-console
+        return module.exports.stop().then(() => {
             options = _options;
             // set up the config
             config = extend(true, {}, origConfig);
             extend(true, config.conf.services[myServiceIdx].conf, options);
             return runner.start(config.conf)
-            .then(() => {
-                stop = () => {
+            .then((serviceReturns) => {
+                module.exports.stop = () => {
                     console.log('stopping test server'); // eslint-disable-line no-console
-                    return runner.stop().then(() => {
-                        stop = function() { return BBPromise.resolve(); };
+                    serviceReturns.forEach(servers =>
+                        servers.forEach(server =>
+                            server.shutdown()));
+                    return runner.stop().then(function () {
+                        module.exports.stop = function () {
+                            return BBPromise.resolve();
+                        };
                     });
                 };
                 return true;
             });
         });
-    } else {
-        return BBPromise.resolve();
-    }
+    });
 
 }
 

@@ -65,5 +65,6 @@ describe('page gets', function() {
         });
     });
 
+    after(() => server.stop());
 });
 

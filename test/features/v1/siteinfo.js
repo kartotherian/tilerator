@@ -67,5 +67,6 @@ describe('wiki site info', function() {
         });
     });
 
+    after(() => server.stop());
 });
 

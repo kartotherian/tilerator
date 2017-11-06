@@ -77,5 +77,7 @@ describe('express app', function() {
         });
     });
 
+    after(() => server.stop());
+
 });
 

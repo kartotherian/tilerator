@@ -11,6 +11,7 @@ const sUtil = require('./lib/util');
 const apiUtil = require('./lib/api-util');
 const packageInfo = require('./package.json');
 const yaml = require('js-yaml');
+const addShutdown = require('http-shutdown');
 
 
 /**
@@ -201,6 +202,7 @@ function createServer(app) {
             app.conf.interface,
             resolve
         );
+        server = addShutdown(server);
     }).then(() => {
         app.logger.log('info',
             `Worker ${process.pid} listening on ${app.conf.interface || '*'}:${app.conf.port}`);
