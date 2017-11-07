@@ -5,6 +5,10 @@ var preq   = require('preq');
 var assert = require('../../utils/assert.js');
 var server = require('../../utils/server.js');
 
+if (!server.stopHookAdded) {
+    server.stopHookAdded = true;
+    after(() => server.stop());
+}
 
 describe('page gets', function() {
 
@@ -64,7 +68,5 @@ describe('page gets', function() {
             assert.deepEqual(err.status, 404);
         });
     });
-
-    after(() => server.stop());
 });
 

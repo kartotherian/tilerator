@@ -5,6 +5,10 @@ var preq   = require('preq');
 var assert = require('../../utils/assert.js');
 var server = require('../../utils/server.js');
 
+if (!server.stopHookAdded) {
+    server.stopHookAdded = true;
+    after(() => server.stop());
+}
 
 describe('errors', function() {
 
@@ -84,7 +88,5 @@ describe('errors', function() {
             assert.deepEqual(err.body.type, 'unauthorized');
         });
     });
-
-    after(() => server.stop());
 });
 

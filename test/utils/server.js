@@ -67,8 +67,9 @@ function start(_options) {
                 return true;
             });
         });
-    });
-
+    } else {
+        return BBPromise.resolve();
+    }
 }
 
 module.exports.config = config;

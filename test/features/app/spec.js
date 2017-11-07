@@ -8,6 +8,10 @@ const URI    = require('swagger-router').URI;
 const yaml   = require('js-yaml');
 const fs     = require('fs');
 
+if (!server.stopHookAdded) {
+    server.stopHookAdded = true;
+    after(() => server.stop());
+}
 
 function staticSpecLoad() {
 
@@ -284,8 +288,5 @@ describe('Swagger spec', function() {
         });
 
     });
-
-    after(() => server.stop());
-
 });
 

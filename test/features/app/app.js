@@ -5,6 +5,10 @@ const preq   = require('preq');
 const assert = require('../../utils/assert.js');
 const server = require('../../utils/server.js');
 
+if (!server.stopHookAdded) {
+    server.stopHookAdded = true;
+    after(() => server.stop());
+}
 
 describe('express app', function() {
 
@@ -76,8 +80,5 @@ describe('express app', function() {
             assert.deepEqual(contentEncoding, undefined, 'Did not expect gzipped contents!');
         });
     });
-
-    after(() => server.stop());
-
 });
 

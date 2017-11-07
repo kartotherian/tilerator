@@ -5,6 +5,10 @@ const preq   = require('preq');
 const assert = require('../../utils/assert.js');
 const server = require('../../utils/server.js');
 
+if (!server.stopHookAdded) {
+    server.stopHookAdded = true;
+    after(() => server.stop());
+}
 
 describe('service information', function() {
 
@@ -65,7 +69,5 @@ describe('service information', function() {
             assert.notDeepEqual(res.body.home, undefined, 'No home field returned!');
         });
     });
-
-    after(() => server.stop());
 });
 
