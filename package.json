@@ -1,6 +1,6 @@
 {
   "name": "service-template-node",
-  "version": "0.6.0",
+  "version": "0.5.3",
   "description": "A blueprint for MediaWiki REST API services",
   "main": "./app.js",
   "scripts": {
@@ -37,8 +37,8 @@
     "domino": "^1.0.30",
     "express": "^4.16.2",
     "js-yaml": "^3.10.0",
-    "preq": "^0.5.2",
-    "service-runner": "^2.4.0",
+    "preq": "^0.5.3",
+    "service-runner": "^2.4.2",
     "swagger-router": "^0.7.1",
     "swagger-ui": "git+https://github.com/wikimedia/swagger-ui#master",
     "http-shutdown": "^1.2.0"
