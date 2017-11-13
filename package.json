@@ -59,7 +59,7 @@
   },
   "deploy": {
     "target": "debian",
-    "node": "6.9.1",
+    "node": "6.11.1",
     "dependencies": {
       "_all": []
     }
