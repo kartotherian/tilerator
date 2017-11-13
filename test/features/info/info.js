@@ -17,7 +17,7 @@ describe('service information', function() {
     before(() => { return server.start(); });
 
     // common URI prefix for info tests
-    const infoUri = server.config.uri + '_info/';
+    const infoUri = `${server.config.uri}_info/`;
 
     // common function used for generating requests
     // and checking their return values

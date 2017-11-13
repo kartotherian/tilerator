@@ -265,7 +265,7 @@ describe('Swagger spec', function() {
             const path = spec.paths[pathStr];
             assert.deepEqual(!!Object.keys(path), true, `No methods defined for path: ${pathStr}`);
             Object.keys(path).forEach((method) => {
-                const  mSpec = path[method];
+                const mSpec = path[method];
                 if ({}.hasOwnProperty.call(mSpec, 'x-monitor') && !mSpec['x-monitor']) {
                     return;
                 }
