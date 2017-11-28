@@ -1,3 +1,5 @@
+/* global describe, it, before, after */
+
 'use strict';
 
 
@@ -12,7 +14,7 @@ if (!server.stopHookAdded) {
 
 describe('service information', function() {
 
-    this.timeout(20000);
+    this.timeout(20000); // eslint-disable-line no-invalid-this
 
     before(() => { return server.start(); });
 

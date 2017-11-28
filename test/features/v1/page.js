@@ -1,9 +1,11 @@
+/* global describe, it, before, after */
+
 'use strict';
 
 
-var preq   = require('preq');
-var assert = require('../../utils/assert.js');
-var server = require('../../utils/server.js');
+const preq   = require('preq');
+const assert = require('../../utils/assert.js');
+const server = require('../../utils/server.js');
 
 if (!server.stopHookAdded) {
     server.stopHookAdded = true;
@@ -12,17 +14,17 @@ if (!server.stopHookAdded) {
 
 describe('page gets', function() {
 
-    this.timeout(20000);
+    this.timeout(20000); // eslint-disable-line no-invalid-this
 
-    before(function () { return server.start(); });
+    before(() => { return server.start(); });
 
     // common URI prefix for the page
-    var uri = server.config.uri + 'en.wikipedia.org/v1/page/Table_(database)/';
+    const uri = `${server.config.uri}en.wikipedia.org/v1/page/Table_(database)/`;
 
-    it('should get the whole page body', function() {
+    it('should get the whole page body', () => {
         return preq.get({
-            uri: uri
-        }).then(function(res) {
+            uri
+        }).then((res) => {
             // check the status
             assert.status(res, 200);
             // check the returned Content-Type header
@@ -30,16 +32,16 @@ describe('page gets', function() {
             // inspect the body
             assert.notDeepEqual(res.body, undefined, 'No body returned!');
             // this should be the right page
-            if(!/Table_\(database\)#cite/.test(res.body)) {
+            if (!/Table_\(database\)#cite/.test(res.body)) {
                 throw new Error('Not the title I was expecting!');
             }
         });
     });
 
-    it('should get only the leading section', function() {
+    it('should get only the leading section', () => {
         return preq.get({
-            uri: uri + 'lead'
-        }).then(function(res) {
+            uri: `${uri}lead`
+        }).then((res) => {
             // check the status
             assert.status(res, 200);
             // check the returned Content-Type header
@@ -47,23 +49,23 @@ describe('page gets', function() {
             // inspect the body
             assert.notDeepEqual(res.body, undefined, 'No body returned!');
             // this should be the right page
-            if(!/Table/.test(res.body)) {
+            if (!/Table/.test(res.body)) {
                 throw new Error('Not the page I was expecting!');
             }
             // .. and should start with <div id="lead_section">
-            if(!/^<div id="lead_section">/.test(res.body)) {
+            if (!/^<div id="lead_section">/.test(res.body)) {
                 throw new Error('This is not a leading section!');
             }
         });
     });
 
-    it('should throw a 404 for a non-existent page', function() {
+    it('should throw a 404 for a non-existent page', () => {
         return preq.get({
-            uri: server.config.uri + 'en.wikipedia.org/v1/page/Foobar_and_friends'
-        }).then(function(res) {
+            uri: `${server.config.uri}en.wikipedia.org/v1/page/Foobar_and_friends`
+        }).then((res) => {
             // if we are here, no error was thrown, not good
             throw new Error('Expected an error to be thrown, got status: ', res.status);
-        }, function(err) {
+        }, (err) => {
             // inspect the status
             assert.deepEqual(err.status, 404);
         });

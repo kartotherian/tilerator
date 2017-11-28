@@ -1,9 +1,11 @@
+/* global describe, it, before, after */
+
 'use strict';
 
 
-var preq   = require('preq');
-var assert = require('../../utils/assert.js');
-var server = require('../../utils/server.js');
+const preq   = require('preq');
+const assert = require('../../utils/assert.js');
+const server = require('../../utils/server.js');
 
 if (!server.stopHookAdded) {
     server.stopHookAdded = true;
@@ -12,17 +14,17 @@ if (!server.stopHookAdded) {
 
 describe('wiki site info', function() {
 
-    this.timeout(20000);
+    this.timeout(20000); // eslint-disable-line no-invalid-this
 
-    before(function () { return server.start(); });
+    before(() => { return server.start(); });
 
     // common URI prefix for v1
-    var uri = server.config.uri + 'en.wikipedia.org/v1/siteinfo/';
+    const uri = `${server.config.uri}en.wikipedia.org/v1/siteinfo/`;
 
-    it('should get all general enwiki site info', function() {
+    it('should get all general enwiki site info', () => {
         return preq.get({
-            uri: uri
-        }).then(function(res) {
+            uri
+        }).then((res) => {
             // check the status
             assert.status(res, 200);
             // check the returned Content-Type header
@@ -33,10 +35,10 @@ describe('wiki site info', function() {
         });
     });
 
-    it('should get the mainpage setting of enwiki', function() {
+    it('should get the mainpage setting of enwiki', () => {
         return preq.get({
-            uri: uri + 'mainpage'
-        }).then(function(res) {
+            uri: `${uri}mainpage`
+        }).then((res) => {
             // check the status
             assert.status(res, 200);
             // check the returned Content-Type header
@@ -47,25 +49,25 @@ describe('wiki site info', function() {
         });
     });
 
-    it('should fail to get a non-existent setting of enwiki', function() {
+    it('should fail to get a non-existent setting of enwiki', () => {
         return preq.get({
-            uri: uri + 'dummy_wiki_setting'
-        }).then(function(res) {
+            uri: `${uri}dummy_wiki_setting`
+        }).then((res) => {
             // if we are here, no error was thrown, not good
-            throw new Error('Expected an error to be thrown, got status: ' + res.status);
-        }, function(err) {
+            throw new Error(`Expected an error to be thrown, got status: ${res.status}`);
+        }, (err) => {
             // inspect the status
             assert.deepEqual(err.status, 404);
         });
     });
 
-    it('should fail to get info from a non-existent wiki', function() {
+    it('should fail to get info from a non-existent wiki', () => {
         return preq.get({
-            uri: server.config.uri + 'non.existent.wiki/v1/siteinfo/'
-        }).then(function(res) {
+            uri: `${server.config.uri}non.existent.wiki/v1/siteinfo/`
+        }).then((res) => {
             // if we are here, no error was thrown, not good
-            throw new Error('Expected an error to be thrown, got status: ' + res.status);
-        }, function(err) {
+            throw new Error(`Expected an error to be thrown, got status: ${res.status}`);
+        }, (err) => {
             // inspect the status
             assert.deepEqual(err.status, 504);
         });

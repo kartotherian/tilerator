@@ -1,9 +1,11 @@
+/* global describe, it, before, after */
+
 'use strict';
 
 
-var preq   = require('preq');
-var assert = require('../../utils/assert.js');
-var server = require('../../utils/server.js');
+const preq   = require('preq');
+const assert = require('../../utils/assert.js');
+const server = require('../../utils/server.js');
 
 if (!server.stopHookAdded) {
     server.stopHookAdded = true;
@@ -12,20 +14,20 @@ if (!server.stopHookAdded) {
 
 describe('errors', function() {
 
-    this.timeout(20000);
+    this.timeout(20000); // eslint-disable-line no-invalid-this
 
-    before(function () { return server.start(); });
+    before(() => { return server.start(); });
 
     // common URI prefix for the errors
-    var uri = server.config.uri + 'ex/err/';
+    const uri = `${server.config.uri}ex/err/`;
 
-    it('array creation error', function() {
+    it('array creation error', () => {
         return preq.get({
-            uri: uri + 'array'
-        }).then(function(res) {
+            uri: `${uri}array`
+        }).then((res) => {
             // if we are here, no error was thrown, not good
-            throw new Error('Expected an error to be thrown, got status: ' + res.status);
-        }, function(err) {
+            throw new Error(`Expected an error to be thrown, got status: ${res.status}`);
+        }, (err) => {
             // inspect the status
             assert.deepEqual(err.status, 500);
             // check the error title
@@ -33,13 +35,13 @@ describe('errors', function() {
         });
     });
 
-    it('file read error', function() {
+    it('file read error', () => {
         return preq.get({
-            uri: uri + 'file'
-        }).then(function(res) {
+            uri: `${uri}file`
+        }).then((res) => {
             // if we are here, no error was thrown, not good
-            throw new Error('Expected an error to be thrown, got status: ' + res.status);
-        }, function(err) {
+            throw new Error(`Expected an error to be thrown, got status: ${res.status}`);
+        }, (err) => {
             // inspect the status
             assert.deepEqual(err.status, 500);
             // check the error title
@@ -47,13 +49,13 @@ describe('errors', function() {
         });
     });
 
-    it('constraint check error', function() {
+    it('constraint check error', () => {
         return preq.get({
-            uri: uri + 'manual/error'
-        }).then(function(res) {
+            uri: `${uri}manual/error`
+        }).then((res) => {
             // if we are here, no error was thrown, not good
-            throw new Error('Expected an error to be thrown, got status: ' + res.status);
-        }, function(err) {
+            throw new Error(`Expected an error to be thrown, got status: ${res.status}`);
+        }, (err) => {
             // inspect the status
             assert.deepEqual(err.status, 500);
             // check the error title
@@ -61,13 +63,13 @@ describe('errors', function() {
         });
     });
 
-    it('access denied error', function() {
+    it('access denied error', () => {
         return preq.get({
-            uri: uri + 'manual/deny'
-        }).then(function(res) {
+            uri: `${uri}manual/deny`
+        }).then((res) => {
             // if we are here, no error was thrown, not good
-            throw new Error('Expected an error to be thrown, got status: ' + res.status);
-        }, function(err) {
+            throw new Error(`Expected an error to be thrown, got status: ${res.status}`);
+        }, (err) => {
             // inspect the status
             assert.deepEqual(err.status, 403);
             // check the error title
@@ -75,13 +77,13 @@ describe('errors', function() {
         });
     });
 
-    it('authorisation error', function() {
+    it('authorisation error', () => {
         return preq.get({
-            uri: uri + 'manual/auth'
-        }).then(function(res) {
+            uri: `${uri}manual/auth`
+        }).then((res) => {
             // if we are here, no error was thrown, not good
-            throw new Error('Expected an error to be thrown, got status: ' + res.status);
-        }, function(err) {
+            throw new Error(`Expected an error to be thrown, got status: ${res.status}`);
+        }, (err) => {
             // inspect the status
             assert.deepEqual(err.status, 401);
             // check the error title
