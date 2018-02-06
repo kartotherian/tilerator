@@ -12,6 +12,7 @@ const apiUtil = require('./lib/api-util');
 const packageInfo = require('./package.json');
 const yaml = require('js-yaml');
 const addShutdown = require('http-shutdown');
+const path = require('path');
 
 
 /**
@@ -138,19 +139,20 @@ function initApp(options) {
  * @param {Application} app the application object to load routes into
  * @return {bluebird} a promise resolving to the app object
  */
-function loadRoutes(app) {
+function loadRoutes(app, dir) {
 
-    // get the list of files in routes/
-    return fs.readdirAsync(`${__dirname}/routes`).map((fname) => {
+    // recursively load routes from .js files under routes/
+    return fs.readdirAsync(dir).map((fname) => {
         return BBPromise.try(() => {
-            // ... and then load each route
-            // but only if it's a js file
-            if (!/\.js$/.test(fname)) {
-                return undefined;
+            const resolvedPath = path.resolve(dir, fname);
+            const isDirectory = fs.statSync(resolvedPath).isDirectory();
+            if (isDirectory) {
+                loadRoutes(app, resolvedPath);
+            } else if (/\.js$/.test(fname)) {
+                // import the route file
+                const route = require(`${dir}/${fname}`);
+                return route(app);
             }
-            // import the route file
-            const route = require(`${__dirname}/routes/${fname}`);
-            return route(app);
         }).then((route) => {
             if (route === undefined) {
                 return undefined;
@@ -229,7 +231,7 @@ function createServer(app) {
 module.exports = function(options) {
 
     return initApp(options)
-    .then(loadRoutes)
+    .then(app => loadRoutes(app, `${__dirname}/routes`))
     .then((app) => {
         // serve static files from static/
         app.use('/static', express.static(`${__dirname}/static`));
