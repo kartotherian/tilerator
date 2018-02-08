@@ -42,10 +42,8 @@ router.get('/siteinfo/:prop?', (req, res) => {
 
     // construct the query for the MW Action API
     const apiQuery = {
-        format: 'json',
         action: 'query',
-        meta: 'siteinfo',
-        continue: ''
+        meta: 'siteinfo'
     };
 
     // send it
