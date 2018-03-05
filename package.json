@@ -62,7 +62,7 @@
     "@kartotherian/substantial": "^0.0.10",
     "@kartotherian/osm-bright-source": "^0.0.5",
     "@kartotherian/osm-bright-style": "^2.1.4",
-    "@kartotherian/jobprocessor": "^0.0.15"
+    "@kartotherian/jobprocessor": "^0.0.18"
   },
   "optionalDependencies": {
     "bunyan-prettystream": "*"
