@@ -65,7 +65,7 @@ services:
       #   - user-agent
       #   - x-request-id
 
-      sources: ./sources.prod.yaml
+      sources: ./sources.dev.yaml
 
       variables:
         cassandra-user: cassandra
