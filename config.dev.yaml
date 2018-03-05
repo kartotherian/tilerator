@@ -80,7 +80,6 @@ services:
       - tilelive-vector
       - "@kartotherian/autogen"
       - "@kartotherian/cassandra"
-      - "@kartotherian/demultiplexer"
       - "@kartotherian/layermixer"
       - "@kartotherian/overzoom"
       - "@kartotherian/postgres"
