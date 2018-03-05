@@ -24,19 +24,6 @@
   "license": "Apache-2.0",
   "bugs": "https://github.com/kartotherian/tilerator/issues",
   "homepage": "https://github.com/kartotherian/tilerator",
-  "kartotherian": {
-    "registerSourceLibs": [
-      "tilelive-bridge",
-      "tilelive-vector",
-      "@kartotherian/autogen",
-      "@kartotherian/cassandra",
-      "@kartotherian/demultiplexer",
-      "@kartotherian/layermixer",
-      "@kartotherian/overzoom",
-      "@kartotherian/postgres",
-      "@kartotherian/substantial"
-    ]
-  },
   "dependencies": {
     "bluebird": "^3.5.0",
     "body-parser": "^1.15.0",
@@ -64,7 +51,7 @@
     "quadtile-index": "^0.0.6",
     "@kartotherian/err": "^0.0.3",
     "@kartotherian/input-validator": "^0.0.6",
-    "@kartotherian/core": "^0.0.21",
+    "@kartotherian/core": "^0.1.1",
     "@kartotherian/server": "^0.0.16",
     "@kartotherian/autogen": "^0.0.10",
     "@kartotherian/babel": "^0.0.7",
