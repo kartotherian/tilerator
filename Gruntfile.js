@@ -30,7 +30,6 @@ module.exports = function Gruntfile(grunt) {
   });
 
   grunt.registerTask('lint', ['eslint']);
-  // grunt.registerTask('test', 'lint');
-  grunt.registerTask('test', ['mochaTest', 'lint']);
+  grunt.registerTask('test', ['lint', 'mochaTest']);
   grunt.registerTask('default', 'test');
 };
