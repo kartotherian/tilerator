@@ -16,7 +16,7 @@ describe('errors', function() {
 
     this.timeout(20000); // eslint-disable-line no-invalid-this
 
-    before(() => { return server.start(); });
+    before(() => server.start());
 
     // common URI prefix for the errors
     const uri = `${server.config.uri}ex/err/`;

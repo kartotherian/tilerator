@@ -16,7 +16,7 @@ describe('page gets', function() {
 
     this.timeout(20000); // eslint-disable-line no-invalid-this
 
-    before(() => { return server.start(); });
+    before(() => server.start());
 
     // common URI prefix for the page
     const uri = `${server.config.uri}en.wikipedia.org/v1/page/Table_(database)/`;

@@ -16,7 +16,7 @@ describe('service information', function() {
 
     this.timeout(20000); // eslint-disable-line no-invalid-this
 
-    before(() => { return server.start(); });
+    before(() => server.start());
 
     // common URI prefix for info tests
     const infoUri = `${server.config.uri}_info/`;
