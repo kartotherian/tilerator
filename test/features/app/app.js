@@ -16,7 +16,7 @@ describe('express app', function() {
 
     this.timeout(20000); // eslint-disable-line no-invalid-this
 
-    before(() => { return server.start(); });
+    before(() => server.start());
 
     it('should get robots.txt', () => {
         return preq.get({
