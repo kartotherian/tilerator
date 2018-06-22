@@ -60,15 +60,16 @@ describe('express app', function() {
         });
     });
 
-    it.skip('should get static content gzipped', () => {
+    it('should get static content gzipped', () => {
         return preq.get({
             uri: `${server.config.uri}static/index.html`,
             headers: {
                 'accept-encoding': 'gzip, deflate'
             }
         }).then((res) => {
-            // check that the response is gzip-ed
-            assert.deepEqual(res.headers['content-encoding'], 'gzip', 'Expected gzipped contents!');
+            assert.deepEqual(res.status, 200);
+            // if there is no content-length, the reponse was gzipped
+            assert.deepEqual(res.headers['content-length'], undefined, 'Did not expect the content-length header!');
         });
     });
 
@@ -79,8 +80,8 @@ describe('express app', function() {
                 'accept-encoding': ''
             }
         }).then((res) => {
-            // check that the response is gzip-ed
             const contentEncoding = res.headers['content-encoding'];
+            assert.deepEqual(res.status, 200);
             assert.deepEqual(contentEncoding, undefined, 'Did not expect gzipped contents!');
         });
     });
