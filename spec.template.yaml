@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  version: 0.2.1
+  version: 0.4.0
   title: WMF Node.JS Service Template
   description: A template for creating Node.JS services
   termsOfService: https://wikimediafoundation.org/wiki/Terms_of_Use
@@ -12,6 +12,23 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0
 x-default-params:
   domain: en.wikipedia.org
+
+parameters:
+  domain:
+    in: path
+    name: domain
+    required: true
+    type: string
+    description: |
+      Project domain for the requested data.
+  title:
+    in: path
+    name: title
+    required: true
+    type: string
+    description: |
+      Page title. Use underscores instead of spaces. Example: `Main_Page`
+
 paths:
   # from routes/root.js
   /robots.txt:
@@ -20,6 +37,13 @@ paths:
         - Root
         - Robots
       description: Gets robots.txt
+      responses:
+        200:
+          description: Success
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/problem'
       x-amples:
         - title: robots.txt check
           request: {}
@@ -35,6 +59,13 @@ paths:
       description: The root service end-point
       produces:
         - application/json
+      responses:
+        200:
+          description: Success
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/problem'
       x-amples:
         - title: root with no query params
           request: {}
@@ -44,6 +75,12 @@ paths:
           request:
             query:
               spec: true
+          response:
+            status: 200
+        - title: doc from root
+          request:
+            query:
+              doc: true
           response:
             status: 200
         - title: root with wrong query param
@@ -62,6 +99,23 @@ paths:
       description: Calls the MW API siteinfo action and returns the response
       produces:
         - application/json
+      parameters:
+        - $ref: '#/parameters/domain'
+      responses:
+        200:
+          description: Success
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/problem'
+        504:
+          description: Server Error
+          schema:
+            $ref: '#/definitions/problem'
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/problem'
       x-amples:
         - title: site info for default domain
           request: {}
@@ -104,6 +158,20 @@ paths:
       produces:
         - text/html
         - application/json
+      parameters:
+        - $ref: '#/parameters/domain'
+        - $ref: '#/parameters/title'
+      responses:
+        200:
+          description: OK
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/problem'
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/problem'
       x-amples:
         - title: get the Foobar page from en.wp.org
           request:
@@ -123,6 +191,20 @@ paths:
       produces:
         - text/html
         - application/json
+      parameters:
+        - $ref: '#/parameters/domain'
+        - $ref: '#/parameters/title'
+      responses:
+        200:
+          description: OK
+        404:
+          description: Not Found
+          schema:
+            $ref: '#/definitions/problem'
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/problem'
       x-amples:
         - title: get the lead section for Barack Obama
           request:
@@ -140,6 +222,9 @@ paths:
       description: Gets information about the service
       produces:
         - application/json
+      responses:
+        200:
+          description: OK
       x-amples:
         - title: retrieve service info
           request: {}
@@ -160,6 +245,9 @@ paths:
       description: Gets the name of the service
       produces:
         - application/json
+      responses:
+        200:
+          description: OK
       x-amples:
         - title: retrieve service name
           request: {}
@@ -177,6 +265,9 @@ paths:
       description: Gets the running version of the service
       produces:
         - application/json
+      responses:
+        200:
+          description: OK
       x-amples:
         - title: retrieve service version
           request: {}
@@ -192,6 +283,9 @@ paths:
         - Service information
         - Service homepage
       description: Redirects to the home page
+      responses:
+        301:
+          description: Redirect
       x-amples:
         - title: redirect to the home page
           request: {}
@@ -207,6 +301,11 @@ paths:
       description: Generates an internal error due to a wrong array declaration
       produces:
         - application/json
+      responses:
+        500:
+          description: Internal Error
+          schema:
+            $ref: '#/definitions/problem'
       x-amples:
         - title: wrong array declaration example
           request: {}
@@ -223,6 +322,11 @@ paths:
       description: Generates an internal error due to a non-existing file
       produces:
         - application/json
+      responses:
+        500:
+          description: Internal Error
+          schema:
+            $ref: '#/definitions/problem'
       x-amples:
         - title: non-existing file example
           request: {}
@@ -239,6 +343,11 @@ paths:
       description: Generates an internal error due to a user-thrown error
       produces:
         - application/json
+      responses:
+        500:
+          description: Internal Error
+          schema:
+            $ref: '#/definitions/problem'
       x-amples:
         - title: user error example
           request: {}
@@ -255,6 +364,11 @@ paths:
       description: Generates an access-denied error
       produces:
         - application/json
+      responses:
+        403:
+          description: Access Denied
+          schema:
+            $ref: '#/definitions/problem'
       x-amples:
         - title: access denied error example
           request: {}
@@ -271,6 +385,11 @@ paths:
       description: Generates an unauthorised error
       produces:
         - application/json
+      responses:
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/problem'
       x-amples:
         - title: unauthorised error example
           request: {}
@@ -278,3 +397,22 @@ paths:
             status: 401
             headers:
               content-type: application/json
+
+definitions:
+  # A https://tools.ietf.org/html/draft-nottingham-http-problem
+  problem:
+    required:
+      - type
+    properties:
+      status:
+        type: integer
+      type:
+        type: string
+      title:
+        type: string
+      detail:
+        type: string
+      method:
+        type: string
+      uri:
+        type: string

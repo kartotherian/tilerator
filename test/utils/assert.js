@@ -1,16 +1,14 @@
+/* eslint-disable no-console */
+
+
 const assert = require('assert');
+
 
 function deepEqual(result, expected, message) {
   try {
-    if (typeof expected === 'string') {
-      assert.ok(result === expected || (new RegExp(expected).test(result)));
-    } else {
-      assert.deepEqual(result, expected, message);
-    }
+    assert.deepEqual(result, expected, message);
   } catch (e) {
-    // eslint-disable-next-line no-console
     console.log(`Expected:\n${JSON.stringify(expected, null, 2)}`);
-    // eslint-disable-next-line no-console
     console.log(`Result:\n${JSON.stringify(result, null, 2)}`);
     throw e;
   }
@@ -30,35 +28,30 @@ function status(res, expected) {
 /**
  * Asserts whether content type was as expected
  */
-function contentType(res, expected) {
+function contentType(res, expectedRegexString) {
   const actual = res.headers['content-type'];
-  deepEqual(
-    actual, expected,
-    `Expected content-type to be ${expected}, but was ${actual}`
+  assert.ok(
+    RegExp(expectedRegexString).test(actual),
+    `Expected content-type to match ${expectedRegexString}, but was ${actual}`
   );
 }
 
 
 function isDeepEqual(result, expected, message) {
   try {
-    if (typeof expected === 'string') {
-      assert.ok(result === expected || (new RegExp(expected).test(result)), message);
-    } else {
-      assert.deepEqual(result, expected, message);
-    }
+    assert.deepEqual(result, expected, message);
     return true;
   } catch (e) {
     return false;
   }
 }
 
+
 function notDeepEqual(result, expected, message) {
   try {
     assert.notDeepEqual(result, expected, message);
   } catch (e) {
-    // eslint-disable-next-line no-console
     console.log(`Not expected:\n${JSON.stringify(expected, null, 2)}`);
-    // eslint-disable-next-line no-console
     console.log(`Result:\n${JSON.stringify(result, null, 2)}`);
     throw e;
   }

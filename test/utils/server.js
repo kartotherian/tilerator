@@ -1,9 +1,11 @@
 const BBPromise = require('bluebird');
 const ServiceRunner = require('service-runner');
+const logStream = require('./logStream');
 const fs = require('fs');
 const assert = require('./assert');
 const yaml = require('js-yaml');
 const extend = require('extend');
+
 
 // set up the configuration
 let config = {
@@ -18,33 +20,43 @@ config.service = myService;
 // no forking, run just one process when testing
 config.conf.num_workers = 0;
 // have a separate, in-memory logger only
+config.conf.logging = {
+  name: 'test-log',
+  level: 'trace',
+  stream: logStream(),
+};
 // make a deep copy of it for later reference
 const origConfig = extend(true, {}, config);
 
-let stop = function stop() {};
+module.exports.stop = () => BBPromise.resolve();
 let options = null;
 const runner = new ServiceRunner();
 
-function start(_options) {
-  const normalizedOptions = _options || {};
 
-  if (!assert.isDeepEqual(options, normalizedOptions)) {
-    stop();
-    options = normalizedOptions;
-    // set up the config
-    config = extend(true, {}, origConfig);
-    extend(true, config.conf.services[myServiceIdx].conf, options);
-    return runner.start(config.conf)
-      .then((servers) => {
-        const server = servers[0];
-        // eslint-disable-next-line no-shadow
-        stop = function stop() {
-          server.close();
-          // eslint-disable-next-line no-func-assign,no-shadow
-          stop = function stop() {};
-        };
-        return true;
-      });
+function start(_options) {
+  _options = _options || {}; // eslint-disable-line no-param-reassign
+
+  if (!assert.isDeepEqual(options, _options)) {
+    console.log('starting test server'); // eslint-disable-line no-console
+    return module.exports.stop().then(() => {
+      options = _options;
+      // set up the config
+      config = extend(true, {}, origConfig);
+      extend(true, config.conf.services[myServiceIdx].conf, options);
+      return runner.start(config.conf)
+        .then((serviceReturns) => {
+          module.exports.stop = () => {
+            console.log('stopping test server'); // eslint-disable-line no-console
+            serviceReturns.forEach(servers =>
+              servers.forEach(server =>
+                server.shutdown()));
+            return runner.stop().then(() => {
+              module.exports.stop = () => BBPromise.resolve();
+            });
+          };
+          return true;
+        });
+    });
   }
   return BBPromise.resolve();
 }

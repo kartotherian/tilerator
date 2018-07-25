@@ -1,7 +1,5 @@
-/* global describe it before */
+/* global describe, it, before, after */
 
-// eslint-disable-next-line strict,lines-around-directive
-'use strict';
 
 const fs = require('fs');
 const preq = require('preq');
@@ -31,8 +29,13 @@ function fileExists(file) {
   return false;
 }
 
-describe('express app', function expressApp() {
-  this.timeout(20000);
+if (!server.stopHookAdded) {
+  server.stopHookAdded = true;
+  after(() => server.stop());
+}
+
+describe('express app', function () { // eslint-disable-line func-names
+  this.timeout(20000); // eslint-disable-line no-invalid-this
 
   before(() => server.start());
 
@@ -41,6 +44,28 @@ describe('express app', function expressApp() {
   }).then((res) => {
     assert.deepEqual(res.status, 200);
     assert.deepEqual(res.headers.disallow, '/');
+  }));
+
+  it('should get static content gzipped', () => preq.get({
+    uri: `${server.config.uri}static/admin.html`,
+    headers: {
+      'accept-encoding': 'gzip, deflate',
+    },
+  }).then((res) => {
+    assert.deepEqual(res.status, 200);
+    // if there is no content-length, the reponse was gzipped
+    assert.deepEqual(res.headers['content-length'], undefined, 'Did not expect the content-length header!');
+  }));
+
+  it('should get static content uncompressed', () => preq.get({
+    uri: `${server.config.uri}static/admin.html`,
+    headers: {
+      'accept-encoding': '',
+    },
+  }).then((res) => {
+    const contentEncoding = res.headers['content-encoding'];
+    assert.deepEqual(res.status, 200);
+    assert.deepEqual(contentEncoding, undefined, 'Did not expect gzipped contents!');
   }));
 
   it('moves a tile from source to destination', () => {
