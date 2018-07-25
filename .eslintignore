@@ -1,0 +1,9 @@
+/lib/swagger-ui.js
+/lib/util.js
+/node_modules
+/routes/info.js
+/routes/root.js
+/test/features/info.js
+/test/utils/**
+/test/index.js
+server.js

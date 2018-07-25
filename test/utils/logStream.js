@@ -1,3 +1,6 @@
+/* eslint-disable no-console */
+
+
 const bunyan = require('bunyan');
 
 function logStream(logStdout) {
@@ -18,7 +21,6 @@ function logStream(logStdout) {
         }
       }
     } catch (e) {
-      // eslint-disable-next-line no-console
       console.error('something went wrong trying to parrot a log entry', e, chunk);
     }
 
@@ -35,29 +37,31 @@ function logStream(logStdout) {
 
   function slice() {
     const begin = log.length;
-    let end2 = null;
+    let end = null; // eslint-disable-line no-shadow
 
     function halt() {
-      if (end2 === null) {
-        end2 = log.length;
+      if (end === null) {
+        end = log.length;
       }
     }
 
-    function get2() {
+    function get() { // eslint-disable-line no-shadow
       return log.slice(begin, end);
     }
 
+    /* Disable eslint object-shorthand until Node 4 support is dropped */
+    /* eslint-disable object-shorthand */
     return {
-      halt,
-      get: get2,
+      halt: halt,
+      get: get,
     };
   }
 
   return {
-    write,
-    end,
-    slice,
-    get,
+    write: write,
+    end: end,
+    slice: slice,
+    get: get,
   };
 }
 

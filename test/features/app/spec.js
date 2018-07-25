@@ -1,7 +1,5 @@
-/* global describe it before */
+/* global describe, it, before, after */
 
-// eslint-disable-next-line strict,lines-around-directive
-'use strict';
 
 const preq = require('preq');
 const assert = require('../../utils/assert.js');
@@ -9,6 +7,11 @@ const server = require('../../utils/server.js');
 const { URI } = require('swagger-router');
 const yaml = require('js-yaml');
 const fs = require('fs');
+
+if (!server.stopHookAdded) {
+  server.stopHookAdded = true;
+  after(() => server.stop());
+}
 
 function staticSpecLoad() {
   let spec;
@@ -85,11 +88,10 @@ function constructTests(paths, defParams) {
   Object.keys(paths).forEach((pathStr) => {
     Object.keys(paths[pathStr]).forEach((method) => {
       const p = paths[pathStr][method];
-      const uri = new URI(pathStr, {}, true);
-
-      if (Object.prototype.hasOwnProperty.call(p, 'x-monitor') && !p['x-monitor']) {
+      if ({}.hasOwnProperty.call(p, 'x-monitor') && !p['x-monitor']) {
         return;
       }
+      const uri = new URI(pathStr, {}, true);
       if (!p['x-amples']) {
         ret.push(constructTestCase(
           pathStr,
@@ -131,7 +133,10 @@ function cmp(result, expected, errMsg) {
   if (expected.constructor === Object) {
     Object.keys(expected).forEach((key) => {
       const val = expected[key];
-      assert.deepEqual(Object.prototype.hasOwnProperty.call(result, key), true, `Body field ${key} not found in response!`);
+      assert.deepEqual(
+        {}.hasOwnProperty.call(result, key), true,
+        `Body field ${key} not found in response!`
+      );
       cmp(result[key], val, `${key} body field mismatch!`);
     });
     return true;
@@ -181,7 +186,10 @@ function validateTestResponse(testCase, res) {
   // check the headers
   Object.keys(expRes.headers).forEach((key) => {
     const val = expRes.headers[key];
-    assert.deepEqual(Object.prototype.hasOwnProperty.call(res.headers, key), true, `Header ${key} not found in response!`);
+    assert.deepEqual(
+      {}.hasOwnProperty.call(res.headers, key), true,
+      `Header ${key} not found in response!`
+    );
     cmp(res.headers[key], val, `${key} header mismatch!`);
   });
   // check the body
@@ -199,7 +207,7 @@ function validateTestResponse(testCase, res) {
   }
   // check that the body type is the same
   if (expRes.body.constructor !== res.body.constructor) {
-    throw new Error(`Expected a body of type ${expRes.body.constructor} but gotten ${res.body.constructor}`);
+    throw new Error(`Expected body type ${expRes.body.constructor} but got ${res.body.constructor}`);
   }
 
   // compare the bodies
@@ -240,13 +248,11 @@ describe('Swagger spec', function swaggerSpecTest() {
     // now check each path
     Object.keys(spec.paths).forEach((pathStr) => {
       const path = spec.paths[pathStr];
-
       assert.deepEqual(!!pathStr, true, 'A path cannot have a length of zero!');
       assert.deepEqual(!!Object.keys(path), true, `No methods defined for path: ${pathStr}`);
-
       Object.keys(path).forEach((method) => {
         const mSpec = path[method];
-        if (Object.prototype.hasOwnProperty.call(mSpec, 'x-monitor') && !mSpec['x-monitor']) {
+        if ({}.hasOwnProperty.call(mSpec, 'x-monitor') && !mSpec['x-monitor']) {
           return;
         }
         validateExamples(pathStr, defParams, mSpec['x-amples']);

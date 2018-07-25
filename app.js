@@ -7,6 +7,8 @@ const fs = BBPromise.promisifyAll(require('fs'));
 const sUtil = require('./lib/util');
 const packageInfo = require('./package.json');
 const yaml = require('js-yaml');
+const addShutdown = require('http-shutdown');
+const path = require('path');
 
 
 /**
@@ -93,6 +95,9 @@ function initApp(options) {
     next();
   });
 
+  // set up the user agent header string to use for requests
+  app.conf.user_agent = app.conf.user_agent || app.info.name;
+
   // disable the X-Powered-By header
   app.set('x-powered-by', false);
   // disable the ETag header - users should provide them!
@@ -113,21 +118,23 @@ function initApp(options) {
  * @param {Application} app the application object to load routes into
  * @returns {bluebird} a promise resolving to the app object
  */
-function loadRoutes(app) {
-  // get the list of files in routes/
-  return fs.readdirAsync(`${__dirname}/routes`).map(fname => BBPromise.try(() => {
-    // ... and then load each route
-    // but only if it's a js file
-    if (!/\.js$/.test(fname)) {
-      return undefined;
+function loadRoutes(app, dir) {
+  // recursively load routes from .js files under routes/
+  /* eslint-disable consistent-return,no-param-reassign */
+  return fs.readdirAsync(dir).map(fname => BBPromise.try(() => {
+    const resolvedPath = path.resolve(dir, fname);
+    const isDirectory = fs.statSync(resolvedPath).isDirectory();
+    if (isDirectory) {
+      loadRoutes(app, resolvedPath);
+    } else if (/\.js$/.test(fname)) {
+      // import the route file
+      // eslint-disable-next-line global-require,import/no-dynamic-require
+      const route = require(`${dir}/${fname}`);
+      return route(app);
     }
-    // import the route file
-    // eslint-disable-next-line import/no-dynamic-require,global-require
-    const route = require(`${__dirname}/routes/${fname}`);
-    return route(app);
   }).then((route) => {
     if (route === undefined) {
-      return;
+      return undefined;
     }
     // check that the route exports the object we need
     if (
@@ -138,21 +145,27 @@ function loadRoutes(app) {
     ) {
       throw new TypeError(`routes/${fname} does not export the correct object!`);
     }
-    // wrap the route handlers with Promise.try() blocks
-    sUtil.wrapRouteHandlers(route.router);
-    // determine the path prefix
-    let prefix = '';
-    if (!route.skip_domain) {
-      prefix = `/:domain/v${route.api_version}`;
+    // normalise the path to be used as the mount point
+    if (route.path[0] !== '/') {
+      route.path = `/${route.path}`;
     }
+    if (route.path[route.path.length - 1] !== '/') {
+      route.path = `${route.path}/`;
+    }
+    if (!route.skip_domain) {
+      route.path = `/:domain/v${route.api_version}${route.path}`;
+    }
+    // wrap the route handlers with Promise.try() blocks
+    sUtil.wrapRouteHandlers(route, app);
     // all good, use that route
-    app.use(prefix + route.path, route.router);
+    app.use(route.path, route.router);
   })).then(() => {
     // catch errors
     sUtil.setErrorHandler(app);
     // route loading is now complete, return the app object
     return BBPromise.resolve(app);
   });
+  /* eslint-enable consistent-return,no-param-reassign */
 }
 
 
@@ -166,17 +179,26 @@ function createServer(app) {
   // attaches the app to it, and starts accepting
   // incoming client requests
   let server;
-  return new BBPromise(((resolve) => {
+  return new BBPromise((resolve) => {
     server = http.createServer(app).listen(
       app.conf.port,
       app.conf.interface,
       resolve
     );
-  })).then(() => {
+    server = addShutdown(server);
+  }).then(() => {
     app.logger.log(
       'info',
-      `Worker ${process.pid} listening on ${app.conf.interface}:${app.conf.port}`
+      `Worker ${process.pid} listening on ${app.conf.interface || '*'}:${app.conf.port}`
     );
+
+    // Don't delay incomplete packets for 40ms (Linux default) on
+    // pipelined HTTP sockets. We write in large chunks or buffers, so
+    // lack of coalescing should not be an issue here.
+    server.on('connection', (socket) => {
+      socket.setNoDelay(true);
+    });
+
     return server;
   });
 }
@@ -189,6 +211,10 @@ function createServer(app) {
  */
 module.exports = function module(options) {
   return initApp(options)
-    .then(loadRoutes)
-    .then(createServer);
+    .then(app => loadRoutes(app, `${__dirname}/routes`))
+    .then((app) => {
+      // serve static files from static/
+      app.use('/static', express.static(`${__dirname}/static`));
+      return app;
+    }).then(createServer);
 };

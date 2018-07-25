@@ -1,12 +1,14 @@
-/* global describe it before */
+/* global describe, it, before, after */
 
-// eslint-disable-next-line strict,lines-around-directive
-'use strict';
 
 const preq = require('preq');
 const assert = require('../../utils/assert.js');
 const server = require('../../utils/server.js');
 
+if (!server.stopHookAdded) {
+  server.stopHookAdded = true;
+  after(() => server.stop());
+}
 
 describe('service information', function serviceInfo() {
   this.timeout(20000);
